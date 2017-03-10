@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pomodoro Timer</string>
+    <string name="action_change_color">Cambia Colore</string>
+    <string name="action_change_view">Cambia Vista</string>
+    <string name="action_delete">Cancellare</string>
+    <string name="action_edit">Modifica</string>
+    <string name="action_rate">Valutazione</string>
+    <string name="action_recommend">Consiglia i tuoi amici</string>
+    <string name="action_save">Salva</string>
+    <string name="action_set_notification">Impostare un allarme</string>
+    <string name="action_settings">Impostazioni</string>
+    <string name="back">Indietro</string>
+    <string name="break_duration">Tempo di pausa</string>
+    <string name="break_time">Tempo di pausa</string>
+    <string name="break_time_for_notify">Tempo di pausa: %1$s</string>
+    <string name="cancel">Annulla</string>
+    <string name="custom">Costume</string>
+    <string name="deleted">Eliminata</string>
+    <string name="done">Fatto</string>
+    <string name="edited">Modificato</string>
+    <string name="enter_blanks">Si prega di non lasciare spazi vuoti</string>
+    <string name="new_record">Nuovo</string>
+    <string name="no_items_found">Non abbiamo trovato nulla</string>
+    <string name="presets">Predefinito</string>
+    <string name="long_break_duration">Tempo di pausa lunga</string>
+    <string name="recommend_text">Vi suggerisco di usare questa applicazione impressionante: https://play.google.com/store/apps/details?id=com.bitlink.pomodoro</string>
+    <string name="saved">Salvato</string>
+    <string name="select_color">Scegli un Colore:</string>
+    <string name="session">sessione</string>
+    <string name="task_name">Nome di Compito</string>
+    <string name="work_time">Tempo di Lavoro: %1$s</string>
+    <string name="sessions">sessioni</string>
+    <string name="minutes">minuti</string>
+    <string name="save_timer">Salvare il timer</string>
+    <string name="total_work_session">Le sessioni di lavoro prima di una lunga pausa</string>
+    <string name="want_to_save_changes">Vuoi salvare le modifiche?</string>
+    <string name="work_session_completed">Sessione di lavoro è stata completata: %1$s</string>
+    <string name="work_session_duration">Sessione di lavoro di durata</string>
+    <string name="action_other_apps">Le nostre altre applicazioni</string>
+    <string name="minute">minuto</string>
+</resources>

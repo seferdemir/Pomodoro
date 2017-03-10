@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#FF4759</color>
+    <color name="colorPrimaryDark">#D93C4C</color>
+    <color name="colorAccent">#D93C4C</color>
+
+    <color name="viewBg">#f1f5f8</color>
+    <color name="title">#4c4c4c</color>
+
+    <color name="cardview_dark_background">#ff202020</color>
+    <color name="cardview_light_background">#fffafafa</color>
+    <color name="cardview_shadow_end_color">#03000000</color>
+    <color name="cardview_shadow_start_color">#37000000</color>
+    <color name="colorDrawerDivider">#ff666666</color>
+
+    <color name="snackbar_background_color">#323232</color>
+
+    <color name="red">#f69988</color>
+    <color name="pink">#f48fb1</color>
+    <color name="purple">#ce93d8</color>
+    <color name="deep_purple">#b39ddb</color>
+    <color name="indigo">#9fa8da</color>
+    <color name="blue">#afbfff</color>
+    <color name="light_blue">#81d4fa</color>
+    <color name="cyan">#80deea</color>
+    <color name="teal">#80cbc4</color>
+    <color name="green">#72d572</color>
+    <color name="light_green">#c5e1a5</color>
+    <color name="lime">#e6ee9c</color>
+    <color name="yellow">#fff59d</color>
+    <color name="amber">#ffe082</color>
+    <color name="orange">#ffcc80</color>
+    <color name="deep_orange">#ffab91</color>
+    <color name="brown">#bcaaa4</color>
+    <color name="grey">#eeeeee</color>
+    <color name="blue_gray">#b0bec5</color>
+
+    <color name="circle_progress_color">#40ffffff</color>
+
+</resources>
