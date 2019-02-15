@@ -112,7 +112,7 @@ containing a value of this type.
           attribute's value can be found in the {@link #HoloCircularProgressBar} array.
           @attr name android:gravity
         */
-        public static final int HoloCircularProgressBar_android_gravity = 0;
+        public static int HoloCircularProgressBar_android_gravity = 0;
         /**
           <p>This symbol is the offset where the {@link com.pascalwelsch.holocircularprogressbar.R.attr#marker_progress}
           attribute's value can be found in the {@link #HoloCircularProgressBar} array.
@@ -126,7 +126,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.pascalwelsch.holocircularprogressbar:marker_progress
         */
-        public static final int HoloCircularProgressBar_marker_progress = 3;
+        public static int HoloCircularProgressBar_marker_progress = 3;
         /**
           <p>This symbol is the offset where the {@link com.pascalwelsch.holocircularprogressbar.R.attr#marker_visible}
           attribute's value can be found in the {@link #HoloCircularProgressBar} array.
@@ -140,7 +140,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.pascalwelsch.holocircularprogressbar:marker_visible
         */
-        public static final int HoloCircularProgressBar_marker_visible = 7;
+        public static int HoloCircularProgressBar_marker_visible = 7;
         /**
           <p>This symbol is the offset where the {@link com.pascalwelsch.holocircularprogressbar.R.attr#progress}
           attribute's value can be found in the {@link #HoloCircularProgressBar} array.
@@ -154,7 +154,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.pascalwelsch.holocircularprogressbar:progress
         */
-        public static final int HoloCircularProgressBar_progress = 2;
+        public static int HoloCircularProgressBar_progress = 2;
         /**
           <p>This symbol is the offset where the {@link com.pascalwelsch.holocircularprogressbar.R.attr#progress_background_color}
           attribute's value can be found in the {@link #HoloCircularProgressBar} array.
@@ -169,7 +169,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.pascalwelsch.holocircularprogressbar:progress_background_color
         */
-        public static final int HoloCircularProgressBar_progress_background_color = 5;
+        public static int HoloCircularProgressBar_progress_background_color = 5;
         /**
           <p>This symbol is the offset where the {@link com.pascalwelsch.holocircularprogressbar.R.attr#progress_color}
           attribute's value can be found in the {@link #HoloCircularProgressBar} array.
@@ -184,7 +184,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.pascalwelsch.holocircularprogressbar:progress_color
         */
-        public static final int HoloCircularProgressBar_progress_color = 4;
+        public static int HoloCircularProgressBar_progress_color = 4;
         /**
           <p>This symbol is the offset where the {@link com.pascalwelsch.holocircularprogressbar.R.attr#stroke_width}
           attribute's value can be found in the {@link #HoloCircularProgressBar} array.
@@ -200,7 +200,7 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.pascalwelsch.holocircularprogressbar:stroke_width
         */
-        public static final int HoloCircularProgressBar_stroke_width = 1;
+        public static int HoloCircularProgressBar_stroke_width = 1;
         /**
           <p>This symbol is the offset where the {@link com.pascalwelsch.holocircularprogressbar.R.attr#thumb_visible}
           attribute's value can be found in the {@link #HoloCircularProgressBar} array.
@@ -214,6 +214,6 @@ theme attribute (in the form
 containing a value of this type.
           @attr name com.pascalwelsch.holocircularprogressbar:thumb_visible
         */
-        public static final int HoloCircularProgressBar_thumb_visible = 6;
+        public static int HoloCircularProgressBar_thumb_visible = 6;
     };
 }

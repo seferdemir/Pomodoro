@@ -6,7 +6,7 @@
     android:versionName="1.1" > <!-- only important for Eclipse. Android Studio overrides this with the build.gradle -->
     <uses-sdk
         android:minSdkVersion="7"
-        android:targetSdkVersion="19"
+        android:targetSdkVersion="16"
         tools:ignore="GradleOverrides" />
 
 </manifest>

@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements ItemsAdapter.OnIt
             shareIntent.putExtra(Intent.EXTRA_TEXT, getResources().getString(R.string.recommend_text));
             startActivity(Intent.createChooser(shareIntent, getText(R.string.action_recommend)));
             return true;
-        } else if (id == R.id.action_rate) {
+        } /*else if (id == R.id.action_rate) {
             Uri uri = Uri.parse("market://details?id=" + mContext.getPackageName());
             Intent myAppLinkToMarket = new Intent(Intent.ACTION_VIEW, uri);
             try {
@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements ItemsAdapter.OnIt
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + mContext.getPackageName())));
             }
             return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }

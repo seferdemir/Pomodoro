@@ -6,8 +6,12 @@ import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -16,6 +20,7 @@ import android.media.RingtoneManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
@@ -25,6 +30,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,6 +47,7 @@ import com.afollestad.materialdialogs.color.CircleView;
 import com.bitlink.pomodoro.R;
 import com.bitlink.pomodoro.database.DatabaseHelper;
 import com.bitlink.pomodoro.database.model.Item;
+import com.bitlink.pomodoro.service.BroadcastService;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
@@ -54,6 +61,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TimerActivity extends AppCompatActivity {
 
+    private final static String TAG = TimerActivity.class.getSimpleName();
     public static final String ARG_ITEM = "id";
     private static final int REQUEST_EDIT = 1;
     private DatabaseHelper databaseHelper = null;
@@ -70,7 +78,6 @@ public class TimerActivity extends AppCompatActivity {
     Calendar newCalendar, mReminderCalendar;
     CountDownTimer mTimer;
     short duration;
-    long remainingMin, remainingSec;
     float progress;
     boolean isRunning = false;
 
@@ -79,6 +86,8 @@ public class TimerActivity extends AppCompatActivity {
 
     private HoloCircularProgressBar mCircularProgressBar;
     private ObjectAnimator mProgressBarAnimator;
+
+    BroadcastService m_service;
 
     Intent notificationIntent;
     NotificationManager notificationManager;
@@ -100,7 +109,7 @@ public class TimerActivity extends AppCompatActivity {
 
         mColorArray = mContext.getResources().getIntArray(R.array.rainbow);
 
-        mSPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        mSPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         mEditor = mSPreferences.edit();
         mEditor.putInt("step", 1);
         mEditor.putInt("break", 0);
@@ -183,30 +192,33 @@ public class TimerActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        registerReceiver(br, new IntentFilter(BroadcastService.COUNTDOWN_BR));
+        Log.i(TAG, "Registered broacast receiver");
         notificationManager.cancelAll();
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        // Save UI state changes to the savedInstanceState.
-        // This bundle will be passed to onCreate if the process is
-        // killed and restarted.
-        savedInstanceState.putLong("Minute", remainingMin);
-        savedInstanceState.putLong("Second", remainingSec);
-        savedInstanceState.putFloat("Progress", mCircularProgressBar.getProgress());
-
-        super.onSaveInstanceState(savedInstanceState);
+    public void onPause() {
+        super.onPause();
+        unregisterReceiver(br);
+        Log.i(TAG, "Unregistered broacast receiver");
     }
 
     @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        // Restore UI state from the savedInstanceState.
-        // This bundle has also been passed to onCreate.
-        remainingMin = savedInstanceState.getLong("Minute");
-        remainingSec = savedInstanceState.getLong("Second");
-        progress = savedInstanceState.getFloat("Progress");
+    public void onStop() {
+        try {
+            unregisterReceiver(br);
+        } catch (Exception e) {
+            // Receiver was probably already stopped in onPause()
+        }
+        super.onStop();
+    }
 
-        super.onRestoreInstanceState(savedInstanceState);
+    @Override
+    public void onDestroy() {
+//        stopService(new Intent(this, BroadcastService.class));
+        Log.i(TAG, "Stopped service");
+        super.onDestroy();
     }
 
     @Override
@@ -339,39 +351,121 @@ public class TimerActivity extends AppCompatActivity {
         long end_millis = mReminderCalendar.getTimeInMillis(); //get the end time in milliseconds
         final long total_millis = (end_millis - start_millis); //total time in milliseconds
 
-        if (total_millis <= 0) {
-//            holder.remainigTime.setText(String.format(mContext.getResources().getString(R.string.timesUp), itemReminder));
-        }
+        mEditor.putLong("millisInFuture", total_millis);
+        mEditor.commit();
 
-//        //1000 = 1 second interval
-        mTimer = new CountDownTimer(total_millis, 1000) {
+
+        Intent intent = new Intent(this, BroadcastService.class);
+        bindService(intent, m_serviceConnection, BIND_AUTO_CREATE);
+        startService(intent);
+
+        mCircularProgressBar.setProgress(0f);
+        mProgressBarAnimator = ObjectAnimator.ofFloat(mCircularProgressBar, "progress", 1f);
+        mProgressBarAnimator.setDuration(1000 * 60 * duration);
+//        mProgressBarAnimator.setDuration(1000 * 10 * duration);
+
+        mProgressBarAnimator.addListener(new Animator.AnimatorListener() {
+
+            @Override
+            public void onAnimationCancel(final Animator animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(final Animator animation) {
+                mProgressBarAnimator.cancel();
+
+                startButton.setVisibility(View.VISIBLE);
+                stopButton.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(final Animator animation) {
+            }
+
+            @Override
+            public void onAnimationStart(final Animator animation) {
+            }
+        });
+
+        /*mProgressBarAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+            @Override
+            public void onAnimationUpdate(final ValueAnimator animation) {
+                mCircularProgressBar.setProgress((Float) animation.getAnimatedValue());
+            }
+        });*/
+
+//        mCircularProgressBar.setMarkerProgress(1f);
+//        mProgressBarAnimator.start();
+
+        startButton.setVisibility(View.GONE);
+        stopButton.setVisibility(View.VISIBLE);
+
+        mCircularProgressBar.setMarkerProgress(1f);
+        mProgressBarAnimator.start();
+
+        isRunning = true;
+    }
+
+    public void StopTimer(View view) {
+
+        stopService(new Intent(this, BroadcastService.class));
+
+        duration = mItem.getWorkSessionDuration();
+
+        edit_task_name.setText(mItem.getTaskName());
+        setColorToolbar(mItem.getWorkSessionColor());
+
+        mEditor.putInt("step", 1);
+        mEditor.putInt("break", 0);
+        mEditor.commit();
+
+        if (mProgressBarAnimator != null)
+            mProgressBarAnimator.cancel();
+        if (mCircularProgressBar != null)
+            mCircularProgressBar.setProgress(0f);
+
+        startButton.setVisibility(View.VISIBLE);
+        stopButton.setVisibility(View.GONE);
+
+        minute_tv.setText(String.valueOf(mItem.getWorkSessionDuration()));
+        second_tv.setText("00");
+
+        isRunning = false;
+    }
+
+    private BroadcastReceiver br = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateGUI(intent); // or whatever method used to update your GUI fields
+        }
+    };
+
+    private void updateGUI(Intent intent) {
+        if (intent.getExtras() != null) {
+            long millisUntilFinished = intent.getLongExtra("countdown", 0);
+            Log.i(TAG, "Countdown seconds remaining: " + millisUntilFinished / 1000);
 
             String sec, min;
             int i = 0;
 
-            @Override
-            public void onTick(long millisUntilFinished) {
+            long minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
+            millisUntilFinished -= TimeUnit.MINUTES.toMillis(minutes);
 
-                long minutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
-                millisUntilFinished -= TimeUnit.MINUTES.toMillis(minutes);
+            long seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
 
-                long seconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
+            min = String.valueOf(minutes);
+            sec = String.valueOf(seconds);
 
-                min = String.valueOf(minutes);
-                sec = String.valueOf(seconds);
+            if (seconds < 10)
+                sec = "0" + sec;
 
-                if (seconds < 10)
-                    sec = "0" + sec;
+            minute_tv.setText(min);
+            second_tv.setText(sec);
 
-                minute_tv.setText(min);
-                second_tv.setText(sec);
+            if (intent.getBooleanExtra("finish", false)) {
+                mCircularProgressBar.setProgress(0f);
 
-                remainingMin = minutes;
-                remainingSec = seconds;
-            }
-
-            @Override
-            public void onFinish() {
                 int step = mSPreferences.getInt("step", 1);
                 int _break = mSPreferences.getInt("break", 0);
 
@@ -432,84 +526,18 @@ public class TimerActivity extends AppCompatActivity {
 
                 notificationManager.notify(0, builder.build());
             }
-        };
-        mTimer.start();
-
-        mCircularProgressBar.setProgress(0f);
-        mProgressBarAnimator = ObjectAnimator.ofFloat(mCircularProgressBar, "progress", 1f);
-        mProgressBarAnimator.setDuration(1000 * 60 * duration);
-//        mProgressBarAnimator.setDuration(1000 * 10 * duration);
-
-        mProgressBarAnimator.addListener(new Animator.AnimatorListener() {
-
-            @Override
-            public void onAnimationCancel(final Animator animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(final Animator animation) {
-                mProgressBarAnimator.cancel();
-
-                startButton.setVisibility(View.VISIBLE);
-                stopButton.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onAnimationRepeat(final Animator animation) {
-            }
-
-            @Override
-            public void onAnimationStart(final Animator animation) {
-            }
-        });
-
-        /*mProgressBarAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-
-            @Override
-            public void onAnimationUpdate(final ValueAnimator animation) {
-                mCircularProgressBar.setProgress((Float) animation.getAnimatedValue());
-            }
-        });*/
-
-//        mCircularProgressBar.setMarkerProgress(1f);
-//        mProgressBarAnimator.start();
-
-        startButton.setVisibility(View.GONE);
-        stopButton.setVisibility(View.VISIBLE);
-
-        mCircularProgressBar.setMarkerProgress(1f);
-        mProgressBarAnimator.start();
-
-        isRunning = true;
+        }
     }
 
-    public void StopTimer(View view) {
+    private ServiceConnection m_serviceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            m_service = ((BroadcastService.MyBinder)service).getService();
+        }
 
-        if (mTimer != null)
-            mTimer.cancel();
-
-        duration = mItem.getWorkSessionDuration();
-
-        edit_task_name.setText(mItem.getTaskName());
-        setColorToolbar(mItem.getWorkSessionColor());
-
-        mEditor.putInt("step", 1);
-        mEditor.putInt("break", 0);
-        mEditor.commit();
-
-        if (mProgressBarAnimator != null)
-            mProgressBarAnimator.cancel();
-        if (mCircularProgressBar != null)
-            mCircularProgressBar.setProgress(0f);
-
-        startButton.setVisibility(View.VISIBLE);
-        stopButton.setVisibility(View.GONE);
-
-        minute_tv.setText(String.valueOf(mItem.getWorkSessionDuration()));
-        second_tv.setText("00");
-
-        isRunning = false;
-    }
+        public void onServiceDisconnected(ComponentName className) {
+            m_service = null;
+        }
+    };
 
     private void notifyAlarm(String title) {
 

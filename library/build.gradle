@@ -1,15 +1,15 @@
-apply plugin: 'android-library'
+apply plugin: 'com.android.library'
 
 group = 'com.pascalwelsch.holocircularprogressbar'
 version = '1.3'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion '19.1.0'
+    compileSdkVersion 26
+    buildToolsVersion '26.0.0'
 
     defaultConfig {
         minSdkVersion 7
-        targetSdkVersion 19
+        targetSdkVersion 16
     }
 
     sourceSets {
